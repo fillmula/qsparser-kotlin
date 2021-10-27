@@ -1,5 +1,6 @@
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import com.fillmula.qsparser.stringify
 
 class StringifyTest {
     @Test
@@ -40,7 +41,7 @@ class StringifyTest {
     @Test
     fun testStringifyEncodesWhitespaces() {
         val result = stringify(mapOf("a" to "b c"))
-        val expected = "a=b c"
+        val expected = "a=b%20c"
         assertEquals(expected, result)
     }
 
@@ -59,7 +60,7 @@ class StringifyTest {
 
     @Test
     fun testStringifyEncodesDictIntoMultipleEntries() {
-        val stringifyStr = stringify(mapOf("a" to mapOf("b" to "c"), "b" to mapOf("e" to "f", "g" to "h")))
+        val stringifyStr = stringify(mapOf("a" to mapOf("b" to "c"), "d" to mapOf("e" to "f", "g" to "h")))
         val result = listOf("a[b]=c&d[e]=f&d[g]=h",
                              "d[e]=f&d[g]=h&a[b]=c",
                              "d[g]=h&d[e]=f&a[b]=c",
