@@ -3,6 +3,7 @@ import kotlin.test.assertEquals
 import com.fillmula.qsparser.parse
 
 class ParseTest {
+
     @Test
     fun testParseDecodesIntIntoString() {
         val result = parse("a=5")
@@ -61,7 +62,7 @@ class ParseTest {
 
     @Test
     fun testParseDecodesEntriesIntoMultipleNestedObjects() {
-        val result = parse("a[0]=1&a[1]=2&a[2]=3&b[0]=q&b[1]=w&b[2]=e")
+        val result = parse("a[b]=c&d[e]=f&d[g]=h")
         val expected = mapOf("a" to mapOf("b" to "c"), "d" to mapOf("e" to "f", "g" to "h"))
         assertEquals(expected, result)
     }

@@ -3,6 +3,7 @@ import kotlin.test.assertEquals
 import com.fillmula.qsparser.stringify
 
 class StringifyTest {
+
     @Test
     fun testStringifyEncodesIntIntoInt() {
         val result = stringify(mapOf("a" to 5))
