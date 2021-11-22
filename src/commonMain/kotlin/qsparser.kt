@@ -19,6 +19,70 @@ private fun decode(str: String): String {
     return URLDecoder.decode(str, "utf-8")
 }
 
+private fun escapeNullString(value: String): String {
+    when (value) {
+        "nil" -> {
+            return "`nil`"
+        }
+        "null" -> {
+            return "`null`"
+        }
+        "Null" -> {
+            return "`Null`"
+        }
+        "NULL" -> {
+            return "`NULL`"
+        }
+        "None" -> {
+            return "`None`"
+        }
+        else -> {
+            return value
+        }
+    }
+}
+
+private fun unescapeNullString(value: String): String? {
+    when (value) {
+        "`nil`" -> {
+            return "nil"
+        }
+        "`null`" -> {
+            return "null"
+        }
+        "`Null`" -> {
+            return "Null"
+        }
+        "`NULL`" -> {
+            return "NULL"
+        }
+        "`None`" -> {
+            return "None"
+        }
+        "nil" -> {
+            return null
+        }
+        "nil" -> {
+            return null
+        }
+        "null" -> {
+            return null
+        }
+        "Null" -> {
+            return null
+        }
+        "NULL" -> {
+            return null
+        }
+        "None" -> {
+            return null
+        }
+        else -> {
+            return value
+        }
+    }
+}
+
 private fun genTokens(items: List<String>, value: Any?): List<String> {
     val result: MutableList<String> = mutableListOf()
     when (value) {
@@ -44,7 +108,7 @@ private fun genTokens(items: List<String>, value: Any?): List<String> {
             return result
         }
         else -> {
-            return mutableListOf("${genKey(items)}=${encode(value.toString())}")
+            return mutableListOf("${genKey(items)}=${escapeNullString(encode(value.toString()))}")
         }
     }
 }
@@ -69,7 +133,7 @@ fun parse(qs: String): Map<String, Any> {
 
 private fun assignToMap(result: MutableMap<String, Any>, items: List<String>, value: String): Any {
     if (items.size == 1) {
-        result[items[0]] = decode(value)
+        result[items[0]] = unescapeNullString(decode(value))
         return result
     }
     if (!result.containsKey(items[0])) {
@@ -92,7 +156,7 @@ private fun assignToMap(result: MutableMap<String, Any>, items: List<String>, va
 
 private fun assignToList(result: MutableList<Any>, items: List<String>, value: String): Any {
     if (items.size == 1) {
-        result.add(decode(value))
+        result.add(unescapeNullString(decode(value)) )
         return result
     }
     if (items[0].toInt() >= result.size) {

@@ -95,4 +95,30 @@ class ParseTest {
         val expected: Map<String, Any> = mapOf()
         assertEquals(expected, result)
     }
+
+    @Test
+    fun testParseDecodesNoneIntoNull() {
+        assertEquals(mapOf("abc" to null), parse("abc=null"))
+        assertEquals(mapOf("abc" to null), parse("abc=nil"))
+        assertEquals(mapOf("abc" to null), parse("abc=Null"))
+        assertEquals(mapOf("abc" to null), parse("abc=NULL"))
+        assertEquals(mapOf("abc" to null), parse("abc=None"))
+    }
+
+    @Test
+    fun testParseDecodesNullRepresentingStringIntoNullString() {
+        assertEquals(mapOf("abc" to "null"), parse("abc=%60null%60"))
+        assertEquals(mapOf("abc" to "Null"), parse("abc=%60Null%60"))
+        assertEquals(mapOf("abc" to "NULL"), parse("abc=%60NULL%60"))
+    }
+
+    @Test
+    fun testParseDecodesNilRepresentingStringIntoNilString() {
+        assertEquals(mapOf("abc" to "nil"), parse("abc=%60nil%60"))
+    }
+
+    @Test
+    fun testParseDecodesNullRepresentingStringIntoNullString() {
+        assertEquals(mapOf("abc" to "None"), parse("abc=%60None%60"))
+    }
 }
