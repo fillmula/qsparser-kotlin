@@ -2,6 +2,13 @@ package com.fillmula.qsparser
 
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import javax.swing.text.DateFormatter
 
 fun stringify(obj: Map<String, Any>): String {
     val tokens: MutableList<String> = mutableListOf()
@@ -107,8 +114,23 @@ private fun genTokens(items: List<String>, value: Any?): List<String> {
             }
             return result
         }
+        is Date -> {
+            var dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            var dateString = dateFormat.format(value)
+            return listOf("${genKey(items)}=${dateString}")
+        }
+        is LocalDate-> {
+            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            var dateString = value.format(formatter)
+            return listOf("${genKey(items)}=${dateString}")
+        }
+        is LocalDateTime-> {
+            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            var dateString = value.format(formatter)
+            return listOf("${genKey(items)}=${dateString}")
+        }
         else -> {
-            return mutableListOf("${genKey(items)}=${escapeNullString(encode(value.toString()))}")
+            return mutableListOf("${genKey(items)}=${encode(escapeNullString(value.toString()))}")
         }
     }
 }
@@ -117,8 +139,8 @@ private fun genKey(items: List<String>): String {
     return "${items[0]}[${items.takeLast(items.size-1).joinToString("][")}]".removeSuffix("[]")
 }
 
-fun parse(qs: String): Map<String, Any> {
-    val result: MutableMap<String, Any> = mutableMapOf()
+fun parse(qs: String): Map<String, Any?> {
+    val result: MutableMap<String, Any?> = mutableMapOf()
     if (qs == "") {
         return result
     }
@@ -131,7 +153,7 @@ fun parse(qs: String): Map<String, Any> {
     return result
 }
 
-private fun assignToMap(result: MutableMap<String, Any>, items: List<String>, value: String): Any {
+private fun assignToMap(result: MutableMap<String, Any?>, items: List<String>, value: String): Any {
     if (items.size == 1) {
         result[items[0]] = unescapeNullString(decode(value))
         return result
@@ -146,15 +168,15 @@ private fun assignToMap(result: MutableMap<String, Any>, items: List<String>, va
     val firstResult = result[items[0]]
     if (firstResult is MutableMap<*, *>) {
         @Suppress("UNCHECKED_CAST")
-        assignToMap(firstResult as MutableMap<String, Any>, items.subList(1, items.size), value)
+        assignToMap(firstResult as MutableMap<String, Any?>, items.subList(1, items.size), value)
     } else if (firstResult is MutableList<*>) {
         @Suppress("UNCHECKED_CAST")
-        assignToList(firstResult as MutableList<Any>, items.subList(1, items.size), value)
+        assignToList(firstResult as MutableList<Any?>, items.subList(1, items.size), value)
     }
     return result
 }
 
-private fun assignToList(result: MutableList<Any>, items: List<String>, value: String): Any {
+private fun assignToList(result: MutableList<Any?>, items: List<String>, value: String): Any {
     if (items.size == 1) {
         result.add(unescapeNullString(decode(value)) )
         return result
@@ -169,10 +191,10 @@ private fun assignToList(result: MutableList<Any>, items: List<String>, value: S
     val index = items[0].toInt()
     if (result[index] is MutableMap<*, *>) {
         @Suppress("UNCHECKED_CAST")
-        assignToMap(result[index] as MutableMap<String, Any>, items.subList(1, items.size), value)
+        assignToMap(result[index] as MutableMap<String, Any?>, items.subList(1, items.size), value)
     } else if (result[index] is MutableList<*>) {
         @Suppress("UNCHECKED_CAST")
-        assignToList(result[index] as MutableList<Any>, items.subList(1, items.size), value)
+        assignToList(result[index] as MutableList<Any?>, items.subList(1, items.size), value)
     }
     return result
 }

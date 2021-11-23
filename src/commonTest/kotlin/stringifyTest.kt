@@ -1,6 +1,11 @@
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import com.fillmula.qsparser.stringify
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class StringifyTest {
 
@@ -36,6 +41,33 @@ class StringifyTest {
     fun testStringifyEncodesStringIntoString() {
         val result = stringify(mapOf("a" to "b"))
         val expected = "a=b"
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun testStringifyEncodesDateIntoString() {
+        val date = Date(32231231232)
+        val result = stringify(mapOf("a" to date))
+        var dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        var expected = "a=${dateFormat.format(date)}"
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun testStringifyEncodesLocalDateIntoString() {
+        val date = LocalDate.now()
+        val result = stringify(mapOf("a" to date))
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        var expected = "a=${date.format(formatter)}"
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun testStringifyEncodesLocalDateTimeIntoString() {
+        val date = LocalDateTime.now()
+        val result = stringify(mapOf("a" to date))
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        var expected = "a=${date.format(formatter)}"
         assertEquals(expected, result)
     }
 
@@ -82,5 +114,22 @@ class StringifyTest {
         val result = stringify(mapOf("_includes" to listOf(mapOf("favorites" to mapOf("_includes" to listOf("user"))))))
         val expected = "_includes[0][favorites][_includes][0]=user"
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun testStringifyEncodesNullRepresentingStringIntoNullString() {
+        assertEquals("string=%60null%60", stringify(mapOf("string" to "null")))
+        assertEquals("string=%60Null%60", stringify(mapOf("string" to "Null")))
+        assertEquals("string=%60NULL%60", stringify(mapOf("string" to "NULL")))
+    }
+
+    @Test
+    fun testStringifyEncodesNilRepresentingStringIntoNilString() {
+        assertEquals("string=%60nil%60", stringify(mapOf("string" to "nil")))
+    }
+
+    @Test
+    fun testStringifyEncodesNoneRepresentingStringIntoNoneString() {
+        assertEquals("string=%60None%60", stringify(mapOf("string" to "None")))
     }
 }

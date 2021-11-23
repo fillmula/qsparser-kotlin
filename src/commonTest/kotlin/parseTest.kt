@@ -118,7 +118,8 @@ class ParseTest {
     }
 
     @Test
-    fun testParseDecodesNullRepresentingStringIntoNullString() {
+    fun testParseDecodesNoneRepresentingStringIntoNoneString() {
         assertEquals(mapOf("abc" to "None"), parse("abc=%60None%60"))
     }
+
 }
